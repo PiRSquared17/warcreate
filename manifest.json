@@ -1,0 +1,35 @@
+{
+  "name": "WARCreate",
+  "version": "0.2012.7.17",
+  "description": "Create Wayback-Consumable WARC Files from Any Webpage",
+  "background_page": "background.html",
+  "content_scripts": [
+	{
+		"matches": ["http://*/*", "https://*/*"],
+		"js": ["content.js"]
+	}
+   ],
+  "page_action" :
+  {
+    "default_icon" : "icon-19.png",
+    "default_title" : "WARCreate, click for options",
+	"default_popup" : "decryptor.html"
+  },
+  "permissions" : [
+	 "webRequest",
+	 "webRequestBlocking",
+     "tabs", 
+	 "http://*/*",
+	 "http://*/",
+	 "*://*/*"
+  ],
+  "options_page": "options.html",
+  "update_url": "http://matkelly.com/warcreate/updates.xml",
+  "icons" : {
+    "48" : "icon-48.png",
+    "128" : "icon-128.png"
+  },
+  
+  "content_security_policy": "script-src 'self'",
+  "minimum_chrome_version": "17.0"
+}
