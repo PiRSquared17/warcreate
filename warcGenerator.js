@@ -155,7 +155,7 @@ function generateWarc(o_request, o_sender, f_callback){
 	
 	
 	var warcHeaderContent = 
-		"software: WARCreate/0.2012.7.17 http://matkelly.com/warcreate" +CRLF + 
+		"software: WARCreate/0.2012.7.23 http://matkelly.com/warcreate" +CRLF + 
 		//"ip: 207.241.235.32" + CRLF + 
 		//"hostname: crawling113.us.archive.org" + CRLF +
 		"format: WARC File Format 1.0" + CRLF +
@@ -208,7 +208,7 @@ function generateWarc(o_request, o_sender, f_callback){
 			"WARC-Concurrent-To: " + warcConcurrentTo + CRLF +
 			"WARC-Record-ID: " + guidGenerator() + CRLF +
 			"Content-Type: application/http; msgtype=request" +CRLF +
-			"Content-Length: " + warcRequest.length + CRLF;
+			"Content-Length: " + (warcRequest.length + 2) + CRLF + CRLF;
 			return x;
 	}
 	
@@ -250,7 +250,9 @@ function generateWarc(o_request, o_sender, f_callback){
 			"WARC-Date: " + now + CRLF +
 			"WARC-Record-ID: "+ guidGenerator() + CRLF +
 			"Content-Type: application/http; msgtype=response" + CRLF +
-			"Content-Length: " + resp.length + CRLF;	
+			//"Foo: "+unescape(encodeURIComponent(resp)).length + CRLF +
+			//"FooBar: "+(unescape(encodeURIComponent(resp)).length - 140)+ CRLF +
+			"Content-Length: " + (unescape(encodeURIComponent(resp)).length - 140) + CRLF;	
 		return xx;
 	}
 	
@@ -262,7 +264,7 @@ function generateWarc(o_request, o_sender, f_callback){
 		warcHeader + CRLF +
 		warcHeaderContent + CRLF + CRLF +
 		warcRequestHeader + CRLF + 
-		warcRequest + CRLF + CRLF + CRLF +
+		warcRequest + CRLF + CRLF  +
 		warcMetadataHeader + CRLF +
 		warcMetadata + CRLF + CRLF  +
 		warcResponseHeader + CRLF +
@@ -335,22 +337,36 @@ function generateWarc(o_request, o_sender, f_callback){
 	
 	//Hey, I know! Let's try to fetch the CSS ex post facto. Now that seems like a good idea. 
 		
-	/* ***************** CSS code at bottom of WARC
+	/* ***************** CSS code at bottom of WARC */
 	
 	var cssFiles = o_request.cssURIs.split("|||");
 	var cssData = o_request.cssData.split("|||");
-	
+	console.log("Processing CSS");
 	for(var cssI=0; cssI<cssFiles.length; cssI++){
+		if(!cssData[cssI]){console.log("Ignoring css "+cssI);continue;}
+		console.log("Processing css "+cssI);
 		var warcRequest = makeRequestHeaderWith(cssFiles[cssI]);
-		warcAsURIString += makeWarcRequestHeaderWith(cssFiles[cssI], now, warcConcurrentTo, warcRequest) + CRLF + CRLF;
+		warcAsURIString += makeWarcRequestHeaderWith(cssFiles[cssI], now, warcConcurrentTo, warcRequest) + CRLF;
 		
 		warcAsURIString += warcRequest +CRLF + CRLF;		
 		
-		warcAsURIString += makeWarcResponseHeaderWith(cssFiles[cssI], now, warcConcurrentTo, cssData[cssI]) + CRLF;
-		warcAsURIString += cssData[cssI] + CRLF + CRLF;
+		var warcResponse =
+			"HTTP/1.1 200 OK" + CRLF +
+			"Content-Type: text/css" + CRLF +
+			"Date: " + nowHttp + CRLF +
+			"Last-Modified: " + nowHttp + CRLF +
+			"Server: Apache/2.2.17 (Unix) PHP/5.3.5 mod_ssl/2.2.17 OpenSSL/0.9.8q" + CRLF +
+			"Accept-Ranges: bytes" + CRLF +
+			"Content-Type: text/css" + CRLF +
+			CRLF + cssData[cssI] + CRLF;
+		//warcResponse += cssData[cssI];
+		warcAsURIString += makeWarcResponseHeaderWith(cssFiles[cssI], now, warcConcurrentTo, warcResponse) + CRLF;
+		
+		warcAsURIString += warcResponse + CRLF + CRLF;
 	}
+	console.log("Done processing CSS");
 	
-	*/
+	
 	
 	
 	warcAsURIString = warcAsURIString.replace(/\r\n/g,"%0D%0A");

@@ -359,6 +359,7 @@ window.onload = function(){
 	var gwButtonDOM = document.createElement('input'); gwButtonDOM.type = "button"; gwButtonDOM.id = "generateWarc"; gwButtonDOM.value = "Generate WARC";
 	var clsButtonDOM = document.createElement('input'); clsButtonDOM.type = "button"; clsButtonDOM.id = "clearLocalStorage"; clsButtonDOM.value = "Clear LocalStorage";
 	
+	
 	//modify text of gwButton if website is in spec
 	//fetchSpec();
 	//if(localStorage["spec"].length > 0){gwButtonDOM.value = "Generate WARC for page";}
@@ -374,6 +375,10 @@ window.onload = function(){
 	var ulButton = document.getElementById('uploader');
 	var clsButton = document.getElementById('clearLocalStorage');
 	var caButton = document.getElementById('generateCohesiveWARC');
+	$(ulButton).css("display","none");
+	//$(clsButton).css("display","none");
+	$(caButton).css("display","none");
+	
 	gwButton.onclick = generate_Warc;
 	caButton.onclick = sequential_generate_Warc;
 	
