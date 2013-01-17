@@ -143,6 +143,10 @@ function generate_Warc(){
 						if(msg.method != "error"){return;}
 						chrome.pageAction.setIcon({path:"icon-alert.png",tabId:tab.id});
 						
+						$("#errorText").text("XAMPP not installed!");
+						$("#errorText").attr("href","http://matkelly.com/warcreate/xampp");
+						$("#errorText").css("display","block");
+						
 						// ALERTS here are immediately hidden. Show the icon-alert icon (above) and let the user know of the error another way
 						//alert("An error occurred. Be sure that you have the XAMPP suite started and Apache enabled.\r\n\r\nSee warcreate.com/requirements for info");
 						//window.close();	//this should close the popup
@@ -344,7 +348,10 @@ function fetchSpec(){
 
 }
 	
+
 window.onload = function(){
+	var background = chrome.extension.getBackgroundPage();
+
 	var buttonContainer = document.getElementById('buttonContainer');
 	
 	var sButton = document.getElementById('submit');
@@ -358,21 +365,24 @@ window.onload = function(){
 	
 	caButtonDOM.value = "Generate WARC for site";
 	
-	
+	//create buttons for popup
 	var gwButtonDOM = document.createElement('input'); gwButtonDOM.type = "button"; gwButtonDOM.id = "generateWarc"; gwButtonDOM.value = "Generate WARC";
 	var clsButtonDOM = document.createElement('input'); clsButtonDOM.type = "button"; clsButtonDOM.id = "clearLocalStorage"; clsButtonDOM.value = "Clear LocalStorage";
 	
+	var errorText = document.createElement("a"); errorText.id = "errorText"; errorText.target = "_blank";
 	
 	//modify text of gwButton if website is in spec
 	//fetchSpec();
 	//if(localStorage["spec"].length > 0){gwButtonDOM.value = "Generate WARC for page";}
 	if(!buttonContainer){return;}
+	
 	//add buttons to DOM
 	buttonContainer.appendChild(gwButtonDOM);
 	//if(localStorage["spec"].length > 0){
 		buttonContainer.appendChild(caButtonDOM);
 	//}
 	buttonContainer.appendChild(clsButtonDOM);
+	$(buttonContainer).prepend(errorText);
 	
 	var gwButton = document.getElementById('generateWarc');
 	var ulButton = document.getElementById('uploader');
