@@ -142,7 +142,8 @@ function generateWarc(o_request, o_sender, f_callback){
 		var S4 = function() {
 		   return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
 		};
-		return "&lt;urn:uuid:"+(S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4())+"&gt;";
+		//return "&lt;urn:uuid:"+(S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4())+"&gt;";
+		return "<urn:uuid:"+(S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4())+">";
 	}
 
 	
