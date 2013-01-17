@@ -367,7 +367,7 @@ function generateWarc(o_request, o_sender, f_callback){
 	
 	
 	
-	
+	/*
 	warcAsURIString = warcAsURIString.replace(/\r\n/g,"%0D%0A");
 	warcAsURIString = warcAsURIString.replace(/\r/g,"%0D");
 	warcAsURIString = warcAsURIString.replace(/\n/g,"%0A");
@@ -375,9 +375,9 @@ function generateWarc(o_request, o_sender, f_callback){
 	warcAsURIString = warcAsURIString.replace(/&gt;/g,"%3E");
 	warcAsURIString = warcAsURIString.replace(/\s/g,"%20");
 	warcAsURIString = warcAsURIString.replace(/=/g,"%3D");
-	warcAsURIString = warcAsURIString.replace(/\//g,"%2F");
+	warcAsURIString = warcAsURIString.replace(/\//g,"%2F");*/
 
-	
+	console.log(warcAsURIString);
 	f_callback({d: warcAsURIString, cssFiles: o_request.cssURIs});
 }
 

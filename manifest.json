@@ -5,6 +5,7 @@
   "background": {
 	"page":"background.html"
    },
+  "homepage_url": "http://warcreate.com",
   "manifest_version": 2,
   "content_scripts": [
 	{
@@ -34,5 +35,5 @@
   },
   
   "content_security_policy": "script-src 'self'; object-src 'self'",
-  "minimum_chrome_version": "17.0"
+  "minimum_chrome_version": "23.0"
 }

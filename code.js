@@ -1,4 +1,5 @@
 
+var server = "http://localhost:8080";
 
 // Called when the url of a tab changes.
 function checkForValidUrl(tabId, changeInfo, tab) {
@@ -103,6 +104,8 @@ function sequential_generate_Warc(){
 }
 
 function generate_Warc(){
+	console.log("generate_warc start");
+	
 	function f_callback(response) 
 	{
 		// *** This method is likely obsolete, as the callback is now done inline
@@ -114,15 +117,15 @@ function generate_Warc(){
 	}
 	var imageData = [];
 	var imageURIs = [];
-	
+	console.log("generate_warc");
 	chrome.tabs.executeScript(null, {file:"js/jquery-1.7.min.js"}, function() {	/* Dependency for hash library and general goodness*/
+		console.log("jquery loaded");
 		chrome.tabs.executeScript(null, {file:"js/jquery.rc4.js"}, function() {	/* Hash library */
+			console.log("jquery rc4 loaded");
 			chrome.tabs.executeScript(null, {file:"date.js"}, function() {		/* Good date formatting library */
-				//alert(document.body.outerHTML);
-				//chrome.tabs.executeScript(null, {file:"warcGenerator.js"}, function() {
-				//var headers = localStorage["paiheaders"];
-				var uris = [];//localStorage["paiheaders_requesturis"];
-				var datum = [];//localStorage["paiheaders_requestdata"];
+				console.log("date.js loaded");
+				var uris = [];
+				var datum = [];
 				
 				chrome.tabs.getSelected(null, function(tab) {	
 					chrome.pageAction.setIcon({path:"icon-running.png",tabId:tab.id});
@@ -139,23 +142,21 @@ function generate_Warc(){
 					});*/
 					
 					port.onMessage.addListener(function(msg){
-						
+						console.log("> 2");
 						if(msg.method != "error"){return;}
 						chrome.pageAction.setIcon({path:"icon-alert.png",tabId:tab.id});
-						
+						console.log("Method in code.js: "+msg.method);
 						$("#errorText").text("XAMPP not installed!");
 						$("#errorText").attr("href","http://matkelly.com/warcreate/xampp");
 						$("#errorText").css("display","block");
-						
-						// ALERTS here are immediately hidden. Show the icon-alert icon (above) and let the user know of the error another way
-						//alert("An error occurred. Be sure that you have the XAMPP suite started and Apache enabled.\r\n\r\nSee warcreate.com/requirements for info");
-						//window.close();	//this should close the popup
+
 					});
 					
 					//perform the first listener, populate the binary image data
 					port.onMessage.addListener(function(msg) {	//get image base64 data
+						console.log("> 1");
 						if(msg.method != "relayToImages"){return;}
-						alert("msg data :" +msg.data);
+						console.log("code.js: received relayToImages post");
 						var cssDataIn = "";
 						var cssFiles = msg.cssURIs;				// a single CSS file
 
@@ -165,7 +166,7 @@ function generate_Warc(){
 							for(var cssFile=0; cssFile<css.length; cssFile++){
 								var reqX=new XMLHttpRequest(); 
 								try{	
-									reqX.open("GET", "http://localhost/getThatText.php?url="+css[cssFile], false);									
+									reqX.open("GET", server+"/getThatText.php?url="+css[cssFile], false);									
 									reqX.send(null);  
 									cssDataIn += "|||"+ reqX.responseText;									
 								}catch (e){
@@ -176,9 +177,10 @@ function generate_Warc(){
 							}
 						}//else {alert("fi");}
 					
-						
+						console.log("About to generateWARC(). Next should be callback.");
 						chrome.extension.sendRequest({url: tab.url, method: 'generateWarc', cssURIs: cssFiles, cssData: cssDataIn, docHtml: msg.html, uris: msg.uris, datum: msg.data, imgData: msg.data},
 						 function(response) {	//the callback to sendRequest
+						 	console.log("generateWARC callback executed");
 							var dlwarclink = document.getElementById('dlWarc');
 							if(dlwarclink == null){		//this hasn't been done before, create a new link
 								var a = document.createElement('a'); 
@@ -196,23 +198,29 @@ function generate_Warc(){
 							//TODO: Can document.write directly from Javascript but below line keeps it in the context of the popup, we want it on a full page.
 							// Use this as a purely client side solution
 							//document.write(response);
-							
-
-							$.post("http://localhost/makewarc.php", {data: response.d},function(data){
-							
-								chrome.tabs.create({url: "http://localhost/"+data});
+							var bb = new BlobBuilder;
+							bb.append(response.d);
+							saveAs(bb.getBlob("text/plain;charset=utf-8"), "firstWarc.warc");
+							/*
+							$.post(server+"/makewarc.php", {data: response.d},function(data){
+								if(data == "Cannot create file :("){
+									console.log(data);
+									return;
+								}
+								
+								chrome.tabs.create({url: server+"/"+data});
 								chrome.pageAction.setIcon({path:"icon-check.png",tabId:tab.id});	//change the warcreate icon to "completed" check.
 								//setTimeout(window.close,1000);
 								
 								//var cssFiles = data.cssFiles.split("|||");
-								/*alert(data.cssFiles.split("|||"));
-								alert(cssFiles[0]);
-								chrome.tabs.create({url: cssFiles[0]},function(tab){
-									generate_Warc();
+								//alert(data.cssFiles.split("|||"));
+								//alert(cssFiles[0]);
+								//chrome.tabs.create({url: cssFiles[0]},function(tab){
+								//	generate_Warc();
 									
-								});*/
+								//});
 							}							
-							,"text");
+							,"text");*/
 							console.log("Done!");
 							//chrome.tabs.create({url: response});
 							//localStorage["paiheaders"] = "";
@@ -281,6 +289,7 @@ function foo(){
 		var port = chrome.tabs.connect(tab.id,{name: "pai2"});
 		port.postMessage({url: tab.url, method: 'inject'});
 		port.onMessage.addListener(function(msg) {
+			console.log("> 3");
 			if(msg.xxx != ""){
 				alert('round trip');
 			}

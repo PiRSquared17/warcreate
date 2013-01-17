@@ -11,7 +11,23 @@ button:hover {cursor:pointer;}
 </style>
 
 
+<!-- test 20130117 Using FileSaver.js as an attempt to not use XAMPP -->
+<script type="application/ecmascript" async="" src="FileSaver/BlobBuilder.min.js"></script>
+<script type="application/ecmascript" async="" src="FileSaver/FileSaver.min.js"></script>
+<!--<script type="application/ecmascript" async="" src="https://raw.github.com/eligrey/FileSaver.js/master/demo/demo.min.js"/>-->
+
+<!-- test 20130117 for save-as dialog -->
+<!-- combined into downloadify.js <script type="text/javascript" src="downloadify/swfobject.js"></script>-->
+<!--<script type="text/javascript" src="downloadify/downloadify.js"></script>
+<script type="text/javascript" src="downloadify/load.js"></script>-->
+
+
 <script src="code.js"></script>
+
+
+
+
+
 </head>
 <body>
 <!--
@@ -35,7 +51,27 @@ button:hover {cursor:pointer;}
 <div id="buttonContainer">
 <!--<input type="button" id="generateWarc"  value="Generate WARCY" />
 <input type="button" id="clearLocalStorage" value="Clear LocalStorage" />-->
+	
 </div>
+
+
+<!-- *** Downloadify *** -->
+<!--<form>
+<p>
+	<label for="filename">Filename</label><br />
+	<input type="text" name="filename" value="testfile.txt" id="filename" />
+</p>
+<p>
+	<label for="data">File Contents</label><br />
+<textarea cols="60" rows="10" name="data" id="data">
+Whatever you put in this text box will be downloaded and saved in the file. If you leave it blank, no file will be downloaded</textarea>
+</p>
+<p id="downloadify">
+	You must have Flash 10 installed to download this file.
+</p>
+</form>-->
+		
+		
 <!--<input type="button" id="generateWarc"  value="Begin Recording (capture forwards)" disabled="disabled" />-->
 <!--</form>-->
 

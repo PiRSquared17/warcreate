@@ -1,3 +1,4 @@
+var server = "http://localhost:8080";
 
 chrome.extension.onConnect.addListener(function(port) {
   //console.assert(port.name == "pai");
@@ -30,12 +31,12 @@ chrome.extension.onConnect.addListener(function(port) {
 			var rawImageData;
 			try{
 				dataURL = canvas.toDataURL("image/png"); //this is problematic re: security exception
-				console.log("try success, content.js");
+				console.log("Successfully converted the image to a data URL in content.js");
 			}catch(err){
 				var req=new XMLHttpRequest();          
 				console.log("hey, let's use the XAMPP suite to get the image data");  
      			try{	//hey, let's use the XAMPP suite to get the image data
-					req.open("GET", "http://localhost/getThatImage.php?url="+image.src, false);                             
+					req.open("GET", server+"/getThatImage.php?url="+image.src, false);                             
 					req.send(null);    
 				}catch (e){	//not-so suite
 					console.log("Cannot use XAMPP :(");
@@ -67,8 +68,7 @@ chrome.extension.onConnect.addListener(function(port) {
 				cssFiles.push(cssLoc);
 			}
 		});
-		
-		
+		console.log("content.js: sending relayToImagesPost");
 		port.postMessage({html: document.all[0].outerHTML, cssURIs: cssFiles.join("|||"), method: "relayToImages",data: imageDataSerialized, uris: imageURIsSerialized});	//communicate back to code.js ~130 with image data
 		port.postMessage({data: imageDataSerialized, method: msg.method, uris: imageURIsSerialized});	//communicate back to code.js ~130 with image data
 	}else {
