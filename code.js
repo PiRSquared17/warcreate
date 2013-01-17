@@ -139,15 +139,19 @@ function generate_Warc(){
 					});*/
 					
 					port.onMessage.addListener(function(msg){
+						
 						if(msg.method != "error"){return;}
 						chrome.pageAction.setIcon({path:"icon-alert.png",tabId:tab.id});
-						alert("An error occurred. Be sure that you have the XAMPP suite started and Apache enabled.");
+						
+						// ALERTS here are immediately hidden. Show the icon-alert icon (above) and let the user know of the error another way
+						//alert("An error occurred. Be sure that you have the XAMPP suite started and Apache enabled.\r\n\r\nSee warcreate.com/requirements for info");
 						//window.close();	//this should close the popup
 					});
 					
 					//perform the first listener, populate the binary image data
 					port.onMessage.addListener(function(msg) {	//get image base64 data
 						if(msg.method != "relayToImages"){return;}
+						alert("msg data :" +msg.data);
 						var cssDataIn = "";
 						var cssFiles = msg.cssURIs;				// a single CSS file
 
@@ -168,7 +172,6 @@ function generate_Warc(){
 							}
 						}//else {alert("fi");}
 					
-						
 						
 						chrome.extension.sendRequest({url: tab.url, method: 'generateWarc', cssURIs: cssFiles, cssData: cssDataIn, docHtml: msg.html, uris: msg.uris, datum: msg.data, imgData: msg.data},
 						 function(response) {	//the callback to sendRequest

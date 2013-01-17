@@ -155,7 +155,7 @@ function generateWarc(o_request, o_sender, f_callback){
 	
 	
 	var warcHeaderContent = 
-		"software: WARCreate/0.2012.7.23 http://matkelly.com/warcreate" +CRLF + 
+		"software: WARCreate/0.2012.9.24 http://matkelly.com/warcreate" +CRLF + 
 		//"ip: 207.241.235.32" + CRLF + 
 		//"hostname: crawling113.us.archive.org" + CRLF +
 		"format: WARC File Format 1.0" + CRLF +
@@ -252,7 +252,7 @@ function generateWarc(o_request, o_sender, f_callback){
 			"Content-Type: application/http; msgtype=response" + CRLF +
 			//"Foo: "+unescape(encodeURIComponent(resp)).length + CRLF +
 			//"FooBar: "+(unescape(encodeURIComponent(resp)).length - 140)+ CRLF +
-			"Content-Length: " + (unescape(encodeURIComponent(resp)).length - 140) + CRLF;	
+			"Content-Length: " + (unescape(encodeURIComponent(resp)).length) + CRLF;	
 		return xx;
 	}
 	
@@ -285,9 +285,8 @@ function generateWarc(o_request, o_sender, f_callback){
 	
 	var warcAsURIString = warc;
 	
-	uriAry = [];
+	//uriAry = [];
 	//***^************************** HARD RESET OF IMAGE ARY FOR TESTING ************************
-	
 	for(i=1; i<uriAry.length; i++){
 		if(uriAry[i].indexOf(".js") != -1){	//isA JS
 			continue;}
@@ -305,7 +304,7 @@ function generateWarc(o_request, o_sender, f_callback){
 			else {contentTypeStr += "data/unknown";}
 			//warcResponseNew = "HTTP/1.1 200 OK" + CRLF + contentTypeStr + CRLF + CRLF + window.atob(imageData[i-1].replace(/data\:image\/(png|jpg|jpeg);base64,/g, ""));
 			warcResponseNew = "HTTP/1.1 200 OK" + CRLF + contentTypeStr + CRLF + CRLF + imageData[i-1];
-			console.log("Success with image "+i);
+			console.log("Success with image "+i+": "+imageData[i-1].substr(0,20));
 		}catch(err) {
 			//console.log("Error: "+o_request.imgData[i-1]);
 			//console.log("o_request.imgData: "+o_request.imgData);

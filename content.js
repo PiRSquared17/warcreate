@@ -8,8 +8,9 @@ chrome.extension.onConnect.addListener(function(port) {
 		images = document.images;
 		var imageURIs = [];
 		var imageBase64Data = [];
-/*		//image conversion code, disabled for WS-DL demo
-
+		//image conversion code
+/* ******************************************* */
+		
 		console.log("Converting image data, "+images.length+" to convert");
 		imagesI = 0;
 		for(var i = 0; i< images.length; i++){
@@ -29,12 +30,15 @@ chrome.extension.onConnect.addListener(function(port) {
 			var rawImageData;
 			try{
 				dataURL = canvas.toDataURL("image/png"); //this is problematic re: security exception
+				console.log("try success, content.js");
 			}catch(err){
-				var req=new XMLHttpRequest();              
+				var req=new XMLHttpRequest();          
+				console.log("hey, let's use the XAMPP suite to get the image data");  
      			try{	//hey, let's use the XAMPP suite to get the image data
 					req.open("GET", "http://localhost/getThatImage.php?url="+image.src, false);                             
 					req.send(null);    
 				}catch (e){	//not-so suite
+					console.log("Cannot use XAMPP :(");
 					port.postMessage({method: 'error'});	//communicate back to code.js so the icon can be changed and any special handling done
 					return;
 				}
@@ -49,8 +53,9 @@ chrome.extension.onConnect.addListener(function(port) {
 			imageURIs[i] = images[i].src;
 			//imageBase64Data[i] = dataStr+dataURL;
 			imageBase64Data[i] = rawImageData;
+			//console.log("Image "+(i+1)+"/"+images.length+" put into data array, len: "+dataURL);
 		}
-*/
+/* ******************************************* */
 		var imageDataSerialized = imageBase64Data.join('|||');
 		var imageURIsSerialized = imageURIs.join('|||');
 		
@@ -65,7 +70,7 @@ chrome.extension.onConnect.addListener(function(port) {
 		
 		
 		port.postMessage({html: document.all[0].outerHTML, cssURIs: cssFiles.join("|||"), method: "relayToImages",data: imageDataSerialized, uris: imageURIsSerialized});	//communicate back to code.js ~130 with image data
-		//port.postMessage({data: imageDataSerialized, method: msg.method, uris: imageURIsSerialized});	//communicate back to code.js ~130 with image data
+		port.postMessage({data: imageDataSerialized, method: msg.method, uris: imageURIsSerialized});	//communicate back to code.js ~130 with image data
 	}else {
 		//alert("method is unsupported: "+msg.method);
 	}
