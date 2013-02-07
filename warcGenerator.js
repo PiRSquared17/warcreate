@@ -149,14 +149,15 @@ function generateWarc(o_request, o_sender, f_callback){
 	
 	var now = new Date().toISOString();
 	var nowHttp = new Date().toString("ddd dd MMM yyyy HH:mm:ss")+" GMT";
-	var fileName = "MY_FABRICATED_WARC.warc";
+	//var fileName = "MY_FABRICATED_WARC.warc";
+	var fileName = o_request.file;
 	//var targetURI = "http://cs.odu.edu/~mkelly/semester/2011_fall/index_encrypted.html";
 	var initURI = o_request.url;
 	
 	
 	
 	var warcHeaderContent = 
-		"software: WARCreate/0.2012.9.24 http://matkelly.com/warcreate" +CRLF + 
+		"software: WARCreate/"+version+" http://warcreate.com" +CRLF + 
 		//"ip: 207.241.235.32" + CRLF + 
 		//"hostname: crawling113.us.archive.org" + CRLF +
 		"format: WARC File Format 1.0" + CRLF +
@@ -381,5 +382,18 @@ function generateWarc(o_request, o_sender, f_callback){
 	console.log(warcAsURIString);
 	f_callback({d: warcAsURIString, cssFiles: o_request.cssURIs});
 }
+
+
+function getVersion(callback) {
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.open('GET', 'manifest.json');
+        xmlhttp.onload = function (e) {
+            var manifest = JSON.parse(xmlhttp.responseText);
+            callback(manifest.version);
+        }
+        xmlhttp.send(null);
+}
+var version;
+getVersion(function (ver) { version = ver; });
 
 chrome.extension.onRequest.addListener(generateWarc);

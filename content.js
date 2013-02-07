@@ -1,4 +1,5 @@
-var server = "http://localhost:8080";
+//var server = "http://localhost:8080";
+var server = "http://warcreate.com";
 
 chrome.extension.onConnect.addListener(function(port) {
   //console.assert(port.name == "pai");
@@ -15,9 +16,10 @@ chrome.extension.onConnect.addListener(function(port) {
 		console.log("Converting image data, "+images.length+" to convert");
 		imagesI = 0;
 		for(var i = 0; i< images.length; i++){
+			var image = images[i];
+			if(!(image.src)){console.log("Image "+i+" had no src. Continuing to encode the others"); continue;}
 			console.log("About to convert image "+(i+1)+"/"+images.length+": "+images[i].src);
 			
-			var image = images[i];
 			var canvas = document.createElement('canvas');
 			canvas.width = image.width;
 			canvas.height = image.height;
@@ -29,17 +31,27 @@ chrome.extension.onConnect.addListener(function(port) {
 			context.drawImage(image,0,0);
 			var dataURL;
 			var rawImageData;
-			try{
-				dataURL = canvas.toDataURL("image/png"); //this is problematic re: security exception
-				console.log("Successfully converted the image to a data URL in content.js");
-			}catch(err){
+			
+			//try{
+			//	dataURL = canvas.toDataURL("image/png"); //this is problematic re: security exception
+			//	console.log("Successfully converted the image to a data URL in content.js");
+			//}catch(err){
+				//console.log("Error 1: "+err.message);
 				var req=new XMLHttpRequest();          
-				console.log("hey, let's use the XAMPP suite to get the image data");  
+				//console.log("hey, let's use the XAMPP suite to get the image data");  
+				//try {
+				//	window.btoa(
+				//}
+				
      			try{	//hey, let's use the XAMPP suite to get the image data
-					req.open("GET", server+"/getThatImage.php?url="+image.src, false);                             
+					console.log("Trying to get "+server+"/getThatImage.php?url="+image.src);
+					port.postMessage({method: "changeStatus", str: i+"/"+images.length});
+					req.open("GET", server+"/getThatImage.php?url="+image.src, false); 
+					                         
 					req.send(null);    
 				}catch (e){	//not-so suite
 					console.log("Cannot use XAMPP :(");
+					console.log("Error 2: "+e.message);
 					port.postMessage({method: 'error'});	//communicate back to code.js so the icon can be changed and any special handling done
 					return;
 				}
@@ -50,7 +62,7 @@ chrome.extension.onConnect.addListener(function(port) {
 				rawImageData = window.atob(req.responseText);
 				var respHeaders = req.getAllResponseHeaders();
 				//return;
-			}
+			//}
 			imageURIs[i] = images[i].src;
 			//imageBase64Data[i] = dataStr+dataURL;
 			imageBase64Data[i] = rawImageData;

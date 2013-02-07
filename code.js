@@ -1,5 +1,6 @@
 
-var server = "http://localhost:8080";
+//var server = "http://localhost:8080";
+var server = "http://warcreate.com";
 
 // Called when the url of a tab changes.
 function checkForValidUrl(tabId, changeInfo, tab) {
@@ -152,6 +153,14 @@ function generate_Warc(){
 
 					});
 					
+					port.onMessage.addListener(function(msg) {
+						console.log("Heard!");
+						if(msg.method != "changeStatus"){return;}
+						$("#status").css("display","block");
+						$("#status").attr("value",msg.str+" imgs processed");
+							
+					});
+					
 					//perform the first listener, populate the binary image data
 					port.onMessage.addListener(function(msg) {	//get image base64 data
 						console.log("> 1");
@@ -162,7 +171,7 @@ function generate_Warc(){
 
 						if(cssFiles.indexOf("|||") != -1){
 							var css = msg.cssURIs.split("|||");	//multiple CSS files represented as a ||| flattened delimited array
-							             
+										 
 							for(var cssFile=0; cssFile<css.length; cssFile++){
 								var reqX=new XMLHttpRequest(); 
 								try{	
@@ -178,9 +187,11 @@ function generate_Warc(){
 						}//else {alert("fi");}
 					
 						console.log("About to generateWARC(). Next should be callback.");
-						chrome.extension.sendRequest({url: tab.url, method: 'generateWarc', cssURIs: cssFiles, cssData: cssDataIn, docHtml: msg.html, uris: msg.uris, datum: msg.data, imgData: msg.data},
+						var fileName = (new Date().toISOString()).replace(/:|\-|\T|\Z|\./g,"") + ".warc";
+						chrome.extension.sendRequest({url: tab.url, method: 'generateWarc', cssURIs: cssFiles, cssData: cssDataIn, docHtml: msg.html, uris: msg.uris, datum: msg.data, imgData: msg.data, file: fileName},
 						 function(response) {	//the callback to sendRequest
-						 	console.log("generateWARC callback executed");
+							console.log("generateWARC callback executed");
+							/*
 							var dlwarclink = document.getElementById('dlWarc');
 							if(dlwarclink == null){		//this hasn't been done before, create a new link
 								var a = document.createElement('a'); 
@@ -192,15 +203,17 @@ function generate_Warc(){
 							}else {//a link has already been created, just change the href
 								dlwarclink.href = response;
 								
-							}
+							}*/
 							
 							
 							//TODO: Can document.write directly from Javascript but below line keeps it in the context of the popup, we want it on a full page.
 							// Use this as a purely client side solution
 							//document.write(response);
+							
+							
 							var bb = new BlobBuilder;
 							bb.append(response.d);
-							saveAs(bb.getBlob("text/plain;charset=utf-8"), "firstWarc.warc");
+							saveAs(bb.getBlob("text/plain;charset=utf-8"), fileName);
 							/*
 							$.post(server+"/makewarc.php", {data: response.d},function(data){
 								if(data == "Cannot create file :("){
@@ -222,16 +235,16 @@ function generate_Warc(){
 							}							
 							,"text");*/
 							console.log("Done!");
+							chrome.pageAction.setIcon({path:"icon-check.png",tabId:tab.id});
 							//chrome.tabs.create({url: response});
 							//localStorage["paiheaders"] = "";
 							
 							
 						});	
 					});
-					
-				});
 				
-			});
+				});
+			}); 
 		});
 	});
 }
@@ -379,6 +392,7 @@ window.onload = function(){
 	var clsButtonDOM = document.createElement('input'); clsButtonDOM.type = "button"; clsButtonDOM.id = "clearLocalStorage"; clsButtonDOM.value = "Clear LocalStorage";
 	
 	var errorText = document.createElement("a"); errorText.id = "errorText"; errorText.target = "_blank";
+	var status = document.createElement("input"); status.id = "status"; status.type = "text"; status.value = ""; 
 	
 	//modify text of gwButton if website is in spec
 	//fetchSpec();
@@ -391,7 +405,10 @@ window.onload = function(){
 		buttonContainer.appendChild(caButtonDOM);
 	//}
 	buttonContainer.appendChild(clsButtonDOM);
+	buttonContainer.appendChild(status);
 	$(buttonContainer).prepend(errorText);
+	$("#status").css("display","none"); //initially hide the status block
+	
 	
 	var gwButton = document.getElementById('generateWarc');
 	var ulButton = document.getElementById('uploader');
